@@ -4,7 +4,7 @@
 #include <iostream>
 // #include <sys/_intsup.h>
 #include "config.h"
-#include <queue>
+#include <deque>
 
 #pragma once
 #include "pros/imu.hpp"
@@ -246,13 +246,19 @@ void holdRing()
 bool isRed = IS_RED;
 float hue = -1;
 bool sort = true;
-std::queue<bool> rings;
-int previousRed = 0;
 int currentRed = 0;
 bool hasCurrent = false;
 bool hasPrevious = false;
-int proximity = 0;
 
+int previousColour = 0;
+int previousDist = 0;
+int ringColour = 0;
+// 0 is none, 1 is red, 2 is blue
+
+int proximity = 0;
+int distance = 0;
+std::deque<int> intakeQ;
+// 1 is a red ring, 2 is a blue ring
 void detectChange()
 {
 	ring_color.set_led_pwm(100);
@@ -260,75 +266,45 @@ void detectChange()
 	while (true)
 	{
 		hue = ring_color.get_hue();
-		// proximity = ring_color.get_proximity();
+		proximity = ring_color.get_proximity();
+		distance = ring_distance.get_distance();
 
 		if (sort)
 		{
-			if ((hue < 30) && (300 > RING_PROXIMITY))
+			if ((hue < 30) && (proximity > RING_PROXIMITY))
 			{
-				if (!IS_RED)
+				ringColour = 1;
+			}
+			else if ((hue > 100) && (proximity > RING_PROXIMITY))
+			{
+				ringColour = 2;
+			}
+			else
+			{
+				ringColour = 0;
+			}
+
+			if (ringColour != previousColour && ringColour != 0)
+			{
+				intakeQ.push_back(ringColour);
+			}
+
+			previousColour = ringColour;
+
+			if (distance < RING_DISTANCE_THRESHOLD && previousDist >= RING_DISTANCE_THRESHOLD && !intakeQ.empty())
+			{
+				if ((IS_RED && intakeQ.front() == 2) || (!IS_RED && intakeQ.front() == 1))
 				{
-					// pros::delay(100); //was 200
 					intakeBackward();
-					pros::delay(500);
+					pros::delay(200);
 					intakeForward();
 				}
-				// detects previous red
-				// previousRed = 2;
+
+				intakeQ.pop_front();
 			}
-			else if ((hue > 100) && (300 > RING_PROXIMITY))
-			{
-				// detects previous blue
-				// previousRed = 1;
-				if (IS_RED)
-				{
-					pros::delay(200);
-					intakeBackward();
-					pros::delay(200);
-					intakeForward();
-				}
-			}
-			// else
-			// {
-			//     previousRed = 0;
-			// }
 
-			// if ((ring_distance.get() < RING_DISTANCE_THRESHOLD))
-			// {
-			//     hasPrevious = true;
-			// }
-			// else
-			// {
-			//     hasPrevious = false;
-			// }
-			// pros::delay(10);
+			previousDist = distance;
 
-			// hue = ring_color.get_hue();
-			// proximity = ring_color.get_proximity();
-
-			// if ((hue < 30) && (proximity > RING_PROXIMITY))
-			// {
-			//     // detects current red
-			//     currentRed = 2;
-			// }
-			// else if ((hue > 100) && (proximity > RING_PROXIMITY))
-			// {
-			//     // detects current blue
-			//     currentRed = 1;
-			// }
-			// else
-			// {
-			//     currentRed = 0;
-			// }
-
-			// if ((ring_distance.get() < RING_DISTANCE_THRESHOLD))
-			// {
-			//     hasCurrent = true;
-			// }
-			// else
-			// {
-			//     hasCurrent = false;
-			// }
 			pros::delay(10);
 		}
 	}
@@ -604,10 +580,15 @@ void initialize()
             pros::lcd::print(0, "X: %f", chassis.getPose().x);         // x
             pros::lcd::print(1, "Y: %f", chassis.getPose().y);         // y
             pros::lcd::print(2, "Theta: %f", ((chassis.getPose().theta) )); // heading
-            // pros::lcd::print(3, "IMU HEADING: %f", imu.get_heading());
+			pros::lcd::print(3, "queue front %i", intakeQ[0]);
+						pros::lcd::print(4, "current color %i", ringColour);
 
-            // delay to save resources
-            pros::delay(20);
+						pros::lcd::print(5, "previous color %i", previousColour);
+
+						// pros::lcd::print(3, "IMU HEADING: %f", imu.get_heading());
+
+						// delay to save resources
+						pros::delay(20);
         } });
 }
 
@@ -1489,8 +1470,8 @@ void opcontrol()
 {
 	pros::Task wallstake_task(wallPID);
 	pros::delay(10);
-	// pros::Task detect_task(detectChange);
-	// pros::delay(10);
+	pros::Task detect_task(detectChange);
+	pros::delay(10);
 	// pros::Task sort_task(colorSort);
 	// pros::delay(10);
 	lift.retract();
