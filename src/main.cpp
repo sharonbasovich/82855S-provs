@@ -295,9 +295,9 @@ void detectChange()
 			{
 				if ((IS_RED && intakeQ.front() == 2) || (!IS_RED && intakeQ.front() == 1))
 				{
-					pros::delay(100);
+					// pros::delay(20);
 					intakeStop();
-					pros::delay(200);
+					pros::delay(400);
 					intakeForward();
 				}
 
