@@ -262,6 +262,7 @@ std::deque<int> intakeQ;
 void detectChange()
 {
 	ring_color.set_led_pwm(100);
+	intakeQ.clear();
 	pros::delay(10);
 	while (true)
 	{
@@ -295,7 +296,7 @@ void detectChange()
 			{
 				if ((IS_RED && intakeQ.front() == 2) || (!IS_RED && intakeQ.front() == 1))
 				{
-					// pros::delay(20);
+					pros::delay(40);
 					intakeStop();
 					pros::delay(400);
 					intakeForward();
@@ -623,41 +624,193 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void sawp()
+
+void leftNoCross()
 {
-	chassis.setPose(-59, 7, 220);
-	pros::Task wallstake_task(wallPID);
-	pros::delay(10);
+	sort = false;
+	chassis.setPose(-63, 8, 180);
+	// pros::Task wallstake_task(wallPID);
+	// pros::delay(10);
 
-	pros::Task holdring_task(holdRing);
-	pros::delay(10);
+	// pros::Task holdring_task(holdRing);
+	// pros::delay(10);
 
+	lift.retract();
 	state += 2;
-	pros::delay(1000);
+	pros::delay(600);
+	chassis.moveToPoint(-40, 15, 500, {.forwards = false});
+	chassis.moveToPoint(-16, 24, 1000, {.forwards = false, .maxSpeed = 60});
 	state -= 2;
-	chassis.moveToPose(-24, 23, -240, 2000, {.forwards = false});
+	pros::delay(1400);
 	clamp.extend();
 	intakeForward();
-	pros::delay(500);
-	chassis.turnToPoint(-23, 50, 2000);
-	chassis.moveToPoint(-23, 50, 2000);
+	pros::delay(200);
+	chassis.turnToPoint(-20, 47, 600);
+	chassis.moveToPoint(-20, 47, 1500);
 
-	chassis.turnToPoint(-52, -10, 2000);
-	clamp.retract();
-	pros::delay(500);
-	chassis.moveToPoint(-52, -10, 2000);
-	hold = true;
+	chassis.turnToPoint(-66, -18, 800);
+	// lift.extend();
+	// chassis.moveToPoint(-40, 9, 700); // intake ring for alliance
 
-	chassis.turnToHeading(220, 2000);
-	chassis.moveToPoint(-23, -24, 2000);
-	clamp.extend();
-	hold = false;
+	chassis.moveToPoint(-58, -16, 3600, {.maxSpeed = 60}); // was -62
+	// pros::delay(2000);
+	// lift.retract();
+	// pros::delay(00);
+	// clamp.extend();
+	// // pros::delay(10);
+	// // lift.extend();
 
-	chassis.turnToPoint(-23, -47, 2000);
-	chassis.moveToPoint(-23, -47, 2000);
+	// // hold = true;
 
-	chassis.moveToPose(-2, -23, 40, 4000, {.maxSpeed = 60});
+	// chassis.turnToHeading(290, 2000);
+	pros::delay(3400);
+	chassis.turnToPoint(-17, 0, 1500, {.maxSpeed = 70});
+	chassis.moveToPoint(-17, 0, 5000, {.maxSpeed = 70});
+	pros::delay(10000);
 }
+
+void sawpLeft()
+{
+	sort = false;
+	chassis.setPose(-63, 8, 180);
+	// pros::Task wallstake_task(wallPID);
+	// pros::delay(10);
+
+	// pros::Task holdring_task(holdRing);
+	// pros::delay(10);
+
+	lift.retract();
+	state += 2;
+	pros::delay(600);
+	chassis.moveToPoint(-40, 15, 500, {.forwards = false});
+	chassis.moveToPoint(-16, 24, 1000, {.forwards = false, .maxSpeed = 60});
+	state -= 2;
+	pros::delay(1400);
+	clamp.extend();
+	intakeForward();
+	pros::delay(200);
+	chassis.turnToPoint(-20, 47, 600);
+	chassis.moveToPoint(-20, 47, 1500);
+
+	chassis.turnToPoint(-66, -18, 800);
+	// lift.extend();
+	// chassis.moveToPoint(-40, 9, 700); // intake ring for alliance
+
+	chassis.moveToPoint(-58, -16, 3600, {.maxSpeed = 60}); // was -62
+	// pros::delay(2000);
+	// lift.retract();
+	// pros::delay(00);
+	// clamp.extend();
+	// // pros::delay(10);
+	// // lift.extend();
+
+	// // hold = true;
+
+	// chassis.turnToHeading(290, 2000);
+	pros::delay(3400);
+	clamp.retract();
+	chassis.turnToHeading(320, 800, {.direction = AngularDirection::CCW_COUNTERCLOCKWISE});
+	// pros::delay(1200);
+	chassis.moveToPoint(-44, -18, 500, {.forwards = false});
+	chassis.moveToPoint(-34, -22, 1000, {.forwards = false, .maxSpeed = 40});
+	pros::delay(1400);
+	clamp.extend();
+	chassis.turnToPoint(-23, -56, 800);
+	chassis.moveToPoint(-23, -56, 1000);
+	chassis.turnToHeading(0, 1000);
+	chassis.moveToPoint(-23, 0, 10000);
+	pros::delay(10000);
+	// chassis.moveToPose(-2, -23, 40, 4000, {.maxSpeed = 60});
+}
+
+void rightNoCross()
+{
+	sort = false;
+	chassis.setPose(-63, -8, 0);
+	// pros::Task wallstake_task(wallPID);
+	// pros::delay(10);
+
+	// pros::Task holdring_task(holdRing);
+	// pros::delay(10);
+
+	lift.retract();
+	state += 2;
+	pros::delay(600);
+	chassis.moveToPoint(-40, -15, 500, {.forwards = false});
+	chassis.moveToPoint(-16, -24, 1000, {.forwards = false, .maxSpeed = 60});
+	state -= 2;
+	pros::delay(1400);
+	clamp.extend();
+	intakeForward();
+	pros::delay(200);
+	chassis.turnToPoint(-20, -47, 600);
+	chassis.moveToPoint(-20, -47, 1500);
+
+	chassis.turnToPoint(-66, 18, 800);
+	// lift.extend();
+	// chassis.moveToPoint(-40, 9, 700); // intake ring for alliance
+
+	chassis.moveToPoint(-58, 16, 5000, {.maxSpeed = 60}); // was -62
+	pros::delay(4800);
+	chassis.turnToPoint(-17, 0, 1500, {.maxSpeed = 70});
+	chassis.moveToPoint(-17, 0, 5000, {.maxSpeed = 70});
+	pros::delay(10000);
+}
+
+void sawpRight()
+{
+	sort = false;
+	chassis.setPose(-63, -8, 0);
+	// pros::Task wallstake_task(wallPID);
+	// pros::delay(10);
+
+	// pros::Task holdring_task(holdRing);
+	// pros::delay(10);
+
+	lift.retract();
+	state += 2;
+	pros::delay(600);
+	chassis.moveToPoint(-40, -15, 500, {.forwards = false});
+	chassis.moveToPoint(-16, -24, 1000, {.forwards = false, .maxSpeed = 60});
+	state -= 2;
+	pros::delay(1400);
+	clamp.extend();
+	intakeForward();
+	pros::delay(200);
+	chassis.turnToPoint(-20, -47, 600);
+	chassis.moveToPoint(-20, -47, 1500);
+
+	chassis.turnToPoint(-66, 18, 800);
+	// lift.extend();
+	// chassis.moveToPoint(-40, 9, 700); // intake ring for alliance
+
+	chassis.moveToPoint(-58, 16, 3600, {.maxSpeed = 60}); // was -62
+	// pros::delay(2000);
+	// lift.retract();
+	// pros::delay(00);
+	// clamp.extend();
+	// // pros::delay(10);
+	// // lift.extend();
+
+	// // hold = true;
+
+	// chassis.turnToHeading(290, 2000);
+	pros::delay(3400);
+	clamp.retract();
+	chassis.turnToHeading(220, 800, {.direction = AngularDirection::CW_CLOCKWISE});
+	// pros::delay(1200);
+	chassis.moveToPoint(-44, 18, 500, {.forwards = false});
+	chassis.moveToPoint(-34, 22, 1000, {.forwards = false, .maxSpeed = 40});
+	pros::delay(1400);
+	clamp.extend();
+	chassis.turnToPoint(-23, 54, 800);
+	chassis.moveToPoint(-23, 54, 1000);
+	chassis.turnToHeading(180, 1000);
+	chassis.moveToPoint(-23, 0, 10000);
+	pros::delay(10000);
+	// chassis.moveToPose(-2, -23, 40, 4000, {.maxSpeed = 60});
+}
+
 void progSkills()
 {
 	// ---------- INITIALIZATION (â‰ˆ1 s delay) ----------
@@ -696,7 +849,7 @@ void progSkills()
 	// Intake first ring on MOGO 1
 	chassis.turnToHeading(70, 400);
 	pros::delay(100);
-	chassis.moveToPoint(-18, -22, 1000);
+	chassis.moveToPoint(-22, -22, 1000);
 	pros::delay(500);
 
 	// Move towards Lady Brown goal and stop intake
@@ -722,15 +875,15 @@ void progSkills()
 	// intake_preroller.move(127);
 
 	// drive back
-	chassis.moveToPoint(9, -42, 900, {.forwards = false});
+	chassis.moveToPoint(6, -42, 900, {.forwards = false});
 	pros::delay(100);
 	chassis.turnToHeading(180, 700);
 
 	// Move to Lady Brown scoring position and release
-	chassis.moveToPoint(3, -68, 2400, {.maxSpeed = 40});
+	chassis.moveToPoint(0, -68, 2400, {.maxSpeed = 40});
 
 	pros::delay(1500);
-	intake_hooks.move(-50);
+	intake_hooks.move(-100);
 	pros::delay(150);
 	intake_hooks.move(0);
 	pros::delay(10);
@@ -753,51 +906,60 @@ void progSkills()
 	pros::delay(500);
 	chassis.moveToPose(-45, -47, 270, 700);
 	pros::delay(10);
-	chassis.moveToPose(-64, -47, 270, 2500, {.maxSpeed = 60});
+	chassis.moveToPose(-64, -47, 270, 2000, {.maxSpeed = 100});
 	pros::delay(500);
 
 	// Score Ring 6
-	chassis.moveToPose(-47, -64, 145, 1500);
-	pros::delay(2000);
+
+	chassis.turnToPoint(-47, -64, 1100, {.maxSpeed = 80});
+
+	chassis.moveToPoint(-47, -64, 1300);
+	pros::delay(1300);
 
 	// Score mogo in the corner
+	chassis.turnToHeading(70, 700);
 
-	chassis.moveToPose(-65, -64, 45, 1500, {.forwards = false});
-	pros::delay(700);
+	chassis.moveToPoint(-77, -70, 500, {.forwards = false});
+	pros::delay(10);
 	clamp.retract();
+	intakeBackward();
 	// ---------- PART 2: SECOND MOGO (=25 s worst-case) ----------
 	// Move towards second mogo
-	pros::delay(100);
+	pros::delay(10);
+
 	chassis.moveToPoint(-53, -36, 700);
 
 	// Turn to align with MOGO 2 using the back clamp
-	chassis.turnToPoint(-52, 5, 600, {.forwards = false});
-	chassis.moveToPoint(-52, 17, 800, {.forwards = false});
+	chassis.turnToPoint(-58, 19, 600, {.forwards = false});
+	chassis.moveToPoint(-58, 19, 800, {.forwards = false});
 	pros::delay(100);
 
 	// SECOND HALF++++++++++++++++++++++
 	//  Approach and clamp MOGO 2
-	chassis.moveToPoint(-52, 17, 1500, {.forwards = false, .maxSpeed = 60});
+	chassis.moveToPoint(-58, 19, 1700, {.forwards = false, .maxSpeed = 40});
 	pros::delay(1300);
 	clamp.extend();
+	intakeForward();
 	pros::delay(700);
 
 	// Move and intake rings on MOGO 2
-	chassis.moveToPose(-21, 24, 90, 1700);
-	pros::delay(500);
-	chassis.moveToPose(-28, 54, 0, 1700);
+	chassis.moveToPose(-22, 18, 120, 1600);
+	pros::delay(1000);
+	// chassis.turnToHeading(340, 500);
+	// pros::delay(500);
+	chassis.moveToPose(-31, 54, 300, 1600);
+	pros::delay(1000);
+
+	chassis.moveToPose(-80, 43, 270, 2500, {.maxSpeed = 60});
 	pros::delay(500);
 
-	chassis.moveToPose(-75, 48, 270, 2500, {.maxSpeed = 50});
-	pros::delay(500);
+	chassis.moveToPose(-58, 30, 350, 800, {.forwards = false});
 
-	chassis.moveToPose(-50, 37, 350, 1000, {.forwards = false});
-
-	chassis.moveToPoint(-51, 64, 1000, {.maxSpeed = 80});
+	chassis.moveToPoint(-58, 66, 1500, {.maxSpeed = 80});
 	pros::delay(500);
 
 	// Score MOGO 2 in the corner
-	chassis.turnToPoint(-68, 75, 700, {.forwards = false});
+	chassis.turnToPoint(-75, 75, 700, {.forwards = false});
 
 	chassis.moveToPoint(-75, 75, 700, {.forwards = false});
 	pros::delay(100);
@@ -809,22 +971,22 @@ void progSkills()
 	// Line up for Lady Brown and score
 
 	// LB 2++++++++++++
-	chassis.moveToPoint(-12, 50, 500, {.earlyExitRange = 3});
+	chassis.moveToPoint(-17, 50, 500, {.earlyExitRange = 3});
 
-	chassis.moveToPoint(-5, 46, 1600, {.maxSpeed = 70});
+	chassis.moveToPoint(-12, 40, 1600, {.maxSpeed = 70});
 	state += 1;
 	pros::delay(500);
-	chassis.turnToHeading(0, 700);
-	chassis.moveToPoint(-10, 70, 1800, {.maxSpeed = 40});
+	chassis.turnToHeading(355, 700);
+	chassis.moveToPoint(-17, 70, 1800, {.maxSpeed = 60});
 	pros::delay(1800);
-	intake_hooks.move(-50);
+	intake_hooks.move(-100);
 	pros::delay(150);
 	intake_hooks.move(0);
 	pros::delay(10);
 	state += 1;
 	pros::delay(900);
 
-	chassis.moveToPoint(0, 46, 1000, {.forwards = false});
+	chassis.moveToPoint(-1, 46, 1000, {.forwards = false});
 	state -= 2;
 	pros::delay(10);
 	hold = true;
@@ -833,9 +995,9 @@ void progSkills()
 	// pros::delay(500);
 
 	// FIRST AND SECOND RING MOGO 3
-	chassis.moveToPoint(27, 52, 1500); //(Ring 1 mogo 3)
+	chassis.moveToPoint(21, 52, 1500); //(Ring 1 mogo 3)
 	pros::delay(250);
-	chassis.moveToPoint(20, 18, 1500);
+	chassis.moveToPoint(9, 18, 1500);
 	// intake 2 rings and move to Mogo 3
 
 	// chassis.moveToPoint(24, 47, 1500); //(Ring 1 mogo 3)
@@ -852,49 +1014,60 @@ void progSkills()
 
 	// pros::delay(50);
 
-	chassis.moveToPoint(39, 5, 2000, {.forwards = false, .maxSpeed = 60});
+	chassis.moveToPoint(33, 0, 2000, {.forwards = false, .maxSpeed = 60});
 	pros::delay(1800);
 	clamp.extend();
-	pros::delay(1000);
+
+	// Intake rings on MOGO 3
+	chassis.moveToPoint(32, 72, 1500);
+	pros::delay(200);
 	hold = false;
 	intakeForward();
 
-	// Intake rings on MOGO 3
-	chassis.moveToPose(44, 68, 0, 2500, {.maxSpeed = 80});
-	pros::delay(2000);
+	chassis.moveToPoint(34, 59, 5000, {.maxSpeed = 35});
 
+	pros::delay(4500);
+	chassis.moveToPoint(32, 41, 800, {.forwards = false});
+	chassis.moveToPoint(52, 55, 1500); // intake ring for alliance
+	pros::delay(1500);
 	// Score MOGO 3 in the corner
-	chassis.turnToHeading(240, 800, {.direction = AngularDirection::CCW_COUNTERCLOCKWISE});
+	chassis.turnToHeading(240, 1000, {.direction = AngularDirection::CW_CLOCKWISE});
 	pros::delay(800);
 	clamp.retract();
-	chassis.moveToPoint(62, 68, 700, {.forwards = false});
+	chassis.moveToPoint(56, 68, 1000, {.forwards = false});
 	pros::delay(250);
 
 	// ---------- ALLIANCE STAKE & HANG (â‰ˆ5 s worst-case) ----------
 	// Move to intake rings for alliance stake
-	hold = true;
-	pros::delay(10);
+	// hold = true;
+	// pros::delay(10);
 
-	chassis.moveToPoint(63, 48, 2000); // intake ring for alliance
-	pros::delay(500);
-	chassis.moveToPoint(47, 31, 2000); // move to position for alliance
+	// chassis.moveToPoint(73, 51, 1000); // intake ring for alliance
+	// pros::delay(500);
+	intakeBackward();
+	chassis.moveToPoint(44, 31, 700); // move to position for alliance
 
 	// LINE UP ALLIANCE
-	chassis.moveToPoint(47, 0, 2000); // move to position for alliance
+	chassis.moveToPoint(47, 0, 1000); // move to position for alliance
 	pros::delay(500);
 	// chassis.moveToPoint(62, 0, 2000); // turn to alliance
 	// pros::delay(500);
-	chassis.turnToHeading(270, 800);
-	chassis.moveToPoint(62, 3, 2000, {.forwards = false}); // go to alliance
-	pros::delay(1500);
+	// chassis.turnToHeading(270, 700);
+	// chassis.moveToPoint(62, 5, 1000, {.forwards = false}); // go to alliance
+	// pros::delay(900);
 
-	hold = false;
-	intakeForward();
-	pros::delay(500);
-	intakeStop();
-	chassis.moveToPoint(56, -19, 1000, {.forwards = false}); // aligh wiht mogo
-	pros::delay(500);
-	chassis.moveToPoint(65, -65, 2000, {.forwards = false}); // push mogo in cornor
+	// hold = false;
+	// intakeForward();
+	// pros::delay(500);
+	// intakeStop();
+	// chassis.moveToPoint(51, 0, 1000, {.forwards = false}); // move to position for alliance
+
+	chassis.turnToHeading(330, 900);
+	chassis.moveToPoint(63, -60, 1300, {.forwards = false}); // move to position for alliance
+	chassis.moveToPoint(12, -14, 10000);
+	// chassis.moveToPoint(56, -19, 1000, {.forwards = false}); // aligh wiht mogo
+	// pros::delay(500);
+	// chassis.moveToPoint(65, -65, 2000, {.forwards = false}); // push mogo in cornor
 	// pros::delay(500);
 	// state += 2; // initiate hang
 	// chassis.moveToPoint(12, -14, 2000);
@@ -909,7 +1082,8 @@ void autonomous()
 	pros::delay(10);
 	pros::Task detect_task(detectChange);
 	pros::delay(10);
-	progSkills();
+	// progSkills();
+	sawpLeft();
 	// RED ringside sawp
 	// auton
 	// alliance stake
@@ -1470,6 +1644,7 @@ int cooldown2 = 0;
 bool check2 = false;
 void opcontrol()
 {
+	sort = true;
 	pros::Task wallstake_task(wallPID);
 	pros::delay(10);
 	pros::Task detect_task(detectChange);
@@ -1550,7 +1725,7 @@ void opcontrol()
 
 			if (state == 1)
 			{
-				intake_hooks.move(-50);
+				intake_hooks.move(-100);
 				pros::delay(150);
 				intake_hooks.move(0);
 				pros::delay(10);
@@ -1591,6 +1766,11 @@ void opcontrol()
 			cooldown--;
 		}
 
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN))
+		{
+			lift.extend();
+		}
+
 		// extend clamp on press
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1))
 		{
@@ -1607,8 +1787,10 @@ void opcontrol()
 			intake_hooks.move(-127);
 		}
 
-		if (check2) {
-			if (cooldown2 == 0) {
+		if (check2)
+		{
+			if (cooldown2 == 0)
+			{
 				check2 = false;
 				if (intake)
 				{
