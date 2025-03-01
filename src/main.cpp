@@ -295,7 +295,8 @@ void detectChange()
 			{
 				if ((IS_RED && intakeQ.front() == 2) || (!IS_RED && intakeQ.front() == 1))
 				{
-					intakeBackward();
+					pros::delay(100);
+					intakeStop();
 					pros::delay(200);
 					intakeForward();
 				}
@@ -505,8 +506,8 @@ void initialize()
 	wall_rotation.set_position(2000);
 	pros::delay(10);
 	ring_color.disable_gesture();
-	// pros::delay(10);
-	// ring_color.set_integration_time(20);
+	pros::delay(10);
+	ring_color.set_integration_time(20);
 
 	// // Initialize button styles for blue
 	// lv_style_init(&blue_style);
@@ -1465,7 +1466,8 @@ bool rushToggle = false;
 bool prerollerToggle = false;
 int cooldown = 0;
 bool check = false;
-
+int cooldown2 = 0;
+bool check2 = false;
 void opcontrol()
 {
 	pros::Task wallstake_task(wallPID);
@@ -1599,6 +1601,29 @@ void opcontrol()
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2))
 		{
 			clamp.retract();
+			check2 = true;
+			cooldown2 = 30;
+			pros::delay(10);
+			intake_hooks.move(-127);
+		}
+
+		if (check2) {
+			if (cooldown2 == 0) {
+				check2 = false;
+				if (intake)
+				{
+					intakeForward();
+				}
+				else if (outake)
+				{
+					intakeBackward();
+				}
+				else
+				{
+					intakeStop();
+				}
+			}
+			cooldown2--;
 		}
 
 		// disable color sort, for matches where colored lighting may mess up detection
